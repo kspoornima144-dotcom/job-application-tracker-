@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Job Application Tracker</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#eef1f6;--surface:#fff;--ink:#17233a;--muted:#5d6b82;--line:#d5dbe6;--accent:#0f6e66;--accent-ink:#fff;--c-wish:#7a6bd0;--c-app:#2b6fd6;--c-int:#c77a0a;--c-off:#1f8a4c;--c-rej:#a8485a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10161f;--surface:#19212d;--ink:#e8edf5;--muted:#9aa7bc;--line:#2b3646;--accent:#3fb9ad;--accent-ink:#0b1a18;--c-wish:#a99cf0;--c-app:#6fa3f5;--c-int:#e9a74a;--c-off:#52c383;--c-rej:#e08597}}
+:root[data-theme="dark"]{--bg:#10161f;--surface:#19212d;--ink:#e8edf5;--muted:#9aa7bc;--line:#2b3646;--accent:#3fb9ad;--accent-ink:#0b1a18;--c-wish:#a99cf0;--c-app:#6fa3f5;--c-int:#e9a74a;--c-off:#52c383;--c-rej:#e08597}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 Figtree,system-ui,sans-serif}
+header,main{max-width:1280px;margin:0 auto;padding:0 20px}
+header{padding-top:28px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between}
+h1{font:700 2rem/1.1 "Bricolage Grotesque",Figtree,sans-serif;margin:0 0 4px}
+.sub{margin:0;color:var(--muted)}
+.tools{display:flex;gap:10px;flex-wrap:wrap}
+input,select,textarea,button{font:inherit;color:inherit}
+input,select,textarea{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 11px;width:100%}
+.tools input{width:220px}
+button{cursor:pointer;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 14px}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 18px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 14px;min-width:96px}
+.stat b{display:block;font:700 1.4rem/1.2 "Bricolage Grotesque",Figtree,sans-serif}
+.stat span{color:var(--muted);font-size:.85rem}
+.board{display:grid;grid-template-columns:repeat(3,minmax(250px,1fr));gap:14px;overflow-x:auto;padding-bottom:30px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:18px;max-width:560px}
+.panel h2{font-size:1rem;margin:0 0 10px}
+.bar{display:grid;grid-template-columns:110px 1fr 28px;gap:10px;align-items:center;margin:6px 0;font-size:.9rem}
+.bar i{display:block;height:10px;background:var(--bg);border-radius:6px;overflow:hidden}
+.bar u{display:block;height:100%;background:var(--accent);text-decoration:none}
+.bar b{text-align:right}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.chips span{font-size:.78rem;border:1px solid var(--line);border-radius:20px;padding:1px 9px;color:var(--muted)}
+.skillpick{display:inline-flex;gap:6px;align-items:center;margin:4px 14px 4px 0;font-weight:400}
+.skillpick input{width:auto}
+.col{background:color-mix(in srgb,var(--surface) 55%,transparent);border:1px solid var(--line);border-radius:12px;padding:10px;min-height:180px}
+.col h2{font-size:1rem;margin:2px 4px 10px;display:flex;justify-content:space-between;align-items:center;border-left:5px solid var(--c);padding-left:8px}
+.col h2 small{color:var(--muted);font-weight:500}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 12px;margin-bottom:10px}
+.card h3{margin:0;font-size:1rem}
+.card .role{color:var(--muted);font-size:.92rem;margin:0 0 6px}
+.card .meta{font-size:.82rem;color:var(--muted)}
+.card .note{font-size:.88rem;margin:6px 0 0;white-space:pre-wrap;word-break:break-word}
+.card a{color:var(--accent);font-size:.88rem}
+.row{display:flex;gap:6px;margin-top:9px;align-items:center}
+.row select{padding:5px 8px;font-size:.85rem}
+.row button{padding:5px 9px;font-size:.85rem}
+.empty{color:var(--muted);font-size:.9rem;padding:6px 4px}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);width:min(460px,92vw);padding:22px}
+dialog::backdrop{background:rgba(10,15,25,.55)}
+dialog h2{margin:0 0 14px;font:700 1.3rem "Bricolage Grotesque",Figtree,sans-serif}
+label{display:block;font-size:.88rem;font-weight:500;margin:10px 0 4px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+.err{color:var(--c-rej);font-size:.85rem;min-height:1.2em;margin-top:6px}
+@media (max-width:700px){.board{grid-template-columns:1fr}.tools input{width:100%}.tools{width:100%}}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Job application tracker</h1>
+    <p class="sub">Add each job you apply for and move it forward as things change.</p>
+  </div>
+  <div class="tools">
+    <input id="q" type="search" placeholder="Search company or role" aria-label="Search jobs">
+    <button class="primary" id="add">Add job</button>
+  </div>
+</header>
+<main>
+  <div class="stats" id="stats"></div>
+  <div class="panel" id="skillstats"></div>
+  <div class="board" id="board"></div>
+</main>
+
+<dialog id="dlg">
+  <form id="f" method="dialog">
+    <h2 id="dt">Add job</h2>
+    <label for="company">Company</label><input id="company" required maxlength="80">
+    <label for="role">Job title</label><input id="role" required maxlength="80">
+    <div class="two">
+      <div><label for="status">Status</label><select id="status"></select></div>
+      <div><label for="date">Date applied</label><input id="date" type="date"></div>
+    </div>
+    <label for="idate">Interview date</label><input id="idate" type="date">
+    <label>Skills needed</label><div id="skills"></div>
+    <label for="link">Job link</label><input id="link" type="url" placeholder="https://">
+    <label for="notes">Notes</label><textarea id="notes" rows="3" maxlength="500" placeholder="Contact person, salary, next step…"></textarea>
+    <div class="err" id="err" role="alert"></div>
+    <div class="actions"><button type="button" id="cancel">Cancel</button><button class="primary" type="submit">Save job</button></div>
+  </form>
+</dialog>
+
+<script>
+var STAGES=[["applied","Applied","--c-app"],["interview","Interview","--c-int"],["rejected","Rejected","--c-rej"]];
+var SKILLS=["Java","Spring Boot","MySQL","REST APIs"];
+var KEY="job-tracker-v1",jobs=[],editId=null;
+function load(){try{var r=localStorage.getItem(KEY);jobs=r?JSON.parse(r):[];if(!Array.isArray(jobs))jobs=[]}catch(e){jobs=[]}jobs.forEach(function(j){if(j.status==="wish")j.status="applied";if(j.status==="offer")j.status="interview"})}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(jobs))}catch(e){}}
+function $(id){return document.getElementById(id)}
+function esc(s){var d=document.createElement("div");d.textContent=s==null?"":s;return d.innerHTML}
+function safeUrl(u){return /^https?:\/\//i.test(u||"")?u:""}
+function fmt(d){if(!d)return"";var p=d.split("-");return new Date(p[0],p[1]-1,p[2]).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"})}
+
+function render(){
+  var q=$("q").value.trim().toLowerCase();
+  var list=jobs.filter(function(j){return !q||(j.company+" "+j.role).toLowerCase().indexOf(q)>-1});
+  var n=jobs.length,cnt=function(s){return jobs.filter(function(j){return j.status===s}).length};
+  var reached=jobs.filter(function(j){return j.status==="interview"||j.idate}).length;
+  var today=new Date().toISOString().slice(0,10);
+  var soon=jobs.filter(function(j){return j.idate&&j.idate>=today}).length;
+  var pct=function(a){return n?Math.round(a/n*100):0};
+  var st="";
+  st+='<div class="stat"><b>'+n+'</b><span>Total applications</span></div>';
+  st+='<div class="stat"><b>'+cnt("applied")+'</b><span>Waiting (Applied)</span></div>';
+  st+='<div class="stat"><b>'+cnt("interview")+'</b><span>In interview stage</span></div>';
+  st+='<div class="stat"><b>'+cnt("rejected")+'</b><span>Rejected</span></div>';
+  st+='<div class="stat"><b>'+pct(reached)+'%</b><span>Got an interview</span></div>';
+  st+='<div class="stat"><b>'+soon+'</b><span>Interviews coming up</span></div>';
+  $("stats").innerHTML=st;
+  var sk='<h2>Skills asked for in your jobs</h2>';
+  SKILLS.forEach(function(s){var c=jobs.filter(function(j){return (j.skills||[]).indexOf(s)>-1}).length;sk+='<div class="bar"><span>'+s+'</span><i><u style="width:'+pct(c)+'%"></u></i><b>'+c+'</b></div>'});
+  $("skillstats").innerHTML=sk;
+  var html="";
+  STAGES.forEach(function(s){
+    var items=list.filter(function(j){return j.status===s[0]});
+    html+='<section class="col" style="--c:var('+s[2]+')"><h2>'+s[1]+'<small>'+items.length+'</small></h2>';
+    if(!items.length)html+='<div class="empty">No jobs here yet.</div>';
+    items.forEach(function(j){
+      var opts=STAGES.map(function(o){return '<option value="'+o[0]+'"'+(o[0]===j.status?" selected":"")+'>'+o[1]+'</option>'}).join("");
+      var u=safeUrl(j.link);
+      html+='<article class="card"><h3>'+esc(j.company)+'</h3><p class="role">'+esc(j.role)+'</p>'
+        +(j.date?'<div class="meta">Applied '+fmt(j.date)+'</div>':'')
+        +(j.idate?'<div class="meta">Interview: '+fmt(j.idate)+'</div>':'')
+        +(j.skills&&j.skills.length?'<div class="chips">'+j.skills.map(function(s){return '<span>'+esc(s)+'</span>'}).join("")+'</div>':'')
+        +(u?'<a href="'+esc(u)+'" target="_blank" rel="noopener noreferrer">Open job post</a>':'')
+        +(j.notes?'<p class="note">'+esc(j.notes)+'</p>':'')
+        +'<div class="row"><select data-move="'+j.id+'" aria-label="Move '+esc(j.company)+' to another stage">'+opts+'</select>'
+        +'<button data-edit="'+j.id+'">Edit</button><button data-del="'+j.id+'">Delete</button></div></article>';
+    });
+    html+='</section>';
+  });
+  $("board").innerHTML=html;
+}
+
+function openForm(id){
+  editId=id||null;
+  var j=jobs.filter(function(x){return x.id===id})[0]||{status:"applied",date:new Date().toISOString().slice(0,10)};
+  $("dt").textContent=id?"Edit job":"Add job";
+  $("company").value=j.company||"";$("role").value=j.role||"";$("status").value=j.status;
+  $("date").value=j.date||"";$("idate").value=j.idate||"";var sel=j.skills||[];Array.prototype.forEach.call($("skills").querySelectorAll("input"),function(c){c.checked=sel.indexOf(c.value)>-1});$("link").value=j.link||"";$("notes").value=j.notes||"";$("err").textContent="";
+  $("dlg").showModal();$("company").focus();
+}
+
+$("status").innerHTML=STAGES.map(function(s){return '<option value="'+s[0]+'">'+s[1]+'</option>'}).join("");
+$("skills").innerHTML=SKILLS.map(function(s){return '<label class="skillpick"><input type="checkbox" value="'+s+'"> '+s+'</label>'}).join("");
+$("add").onclick=function(){openForm()};
+$("cancel").onclick=function(){$("dlg").close()};
+$("q").oninput=render;
+$("f").onsubmit=function(e){
+  e.preventDefault();
+  var link=$("link").value.trim();
+  if(link&&!safeUrl(link)){$("err").textContent="The job link must start with http:// or https://";return}
+  var data={company:$("company").value.trim(),role:$("role").value.trim(),status:$("status").value,date:$("date").value,idate:$("idate").value,skills:Array.prototype.map.call($("skills").querySelectorAll("input:checked"),function(c){return c.value}),link:link,notes:$("notes").value.trim()};
+  if(!data.company||!data.role){$("err").textContent="Enter a company and a job title.";return}
+  if(editId){jobs=jobs.map(function(j){return j.id===editId?Object.assign({},j,data):j})}
+  else{data.id="j"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);jobs.unshift(data)}
+  save();render();$("dlg").close();
+};
+$("board").onclick=function(e){
+  var t=e.target;
+  if(t.dataset.edit)openForm(t.dataset.edit);
+  if(t.dataset.del&&confirm("Delete this job from your tracker?")){jobs=jobs.filter(function(j){return j.id!==t.dataset.del});save();render()}
+};
+$("board").onchange=function(e){
+  var id=e.target.dataset.move;if(!id)return;
+  jobs.forEach(function(j){if(j.id===id)j.status=e.target.value});save();render();
+};
+load();render();
+</script>
+</body>
+</html>
